@@ -6,6 +6,8 @@ type Option = {
   id: string;
   label: string;
   price: number;
+  emoji: string;
+  desc?: string;
 };
 
 type Category = {
@@ -19,38 +21,39 @@ const categories: Category[] = [
     title: "基本メニュー",
     type: "single",
     options: [
-      { id: "basic-1", label: "ベーシックプラン", price: 5000 },
-      { id: "basic-2", label: "スタンダードプラン", price: 8000 },
-      { id: "basic-3", label: "プレミアムプラン", price: 12000 },
+      { id: "basic-1", label: "ベーシック", price: 5000, emoji: "🌿", desc: "基本ケア60分" },
+      { id: "basic-2", label: "スタンダード", price: 8000, emoji: "🍃", desc: "全身ケア90分" },
+      { id: "basic-3", label: "プレミアム", price: 12000, emoji: "✨", desc: "極上コース120分" },
     ],
   },
   {
     title: "ご利用時間",
     type: "single",
     options: [
-      { id: "time-1", label: "60分", price: 0 },
-      { id: "time-2", label: "90分（+2,000円）", price: 2000 },
-      { id: "time-3", label: "120分（+4,000円）", price: 4000 },
+      { id: "time-1", label: "60分", price: 0, emoji: "⏱️" },
+      { id: "time-2", label: "90分", price: 2000, emoji: "⏱️" },
+      { id: "time-3", label: "120分", price: 4000, emoji: "⏱️" },
     ],
   },
   {
     title: "オプション",
     type: "multi",
     options: [
-      { id: "opt-1", label: "アロマセラピー", price: 1500 },
-      { id: "opt-2", label: "ホットストーン", price: 2000 },
-      { id: "opt-3", label: "ヘッドスパ", price: 1800 },
-      { id: "opt-4", label: "フットケア", price: 1200 },
-      { id: "opt-5", label: "美容パック", price: 2500 },
+      { id: "opt-1", label: "アロマセラピー", price: 1500, emoji: "🕯️" },
+      { id: "opt-2", label: "ホットストーン", price: 2000, emoji: "🪨" },
+      { id: "opt-3", label: "ヘッドスパ", price: 1800, emoji: "💆" },
+      { id: "opt-4", label: "フットケア", price: 1200, emoji: "🦶" },
+      { id: "opt-5", label: "美容パック", price: 2500, emoji: "🧴" },
+      { id: "opt-6", label: "ハーブティー", price: 500, emoji: "🍵" },
     ],
   },
   {
     title: "ご利用人数",
     type: "single",
     options: [
-      { id: "ppl-1", label: "1名", price: 0 },
-      { id: "ppl-2", label: "2名（ペア割 -500円）", price: -500 },
-      { id: "ppl-3", label: "3名以上（グループ割 -1,000円）", price: -1000 },
+      { id: "ppl-1", label: "1名", price: 0, emoji: "👤" },
+      { id: "ppl-2", label: "2名", price: -500, emoji: "👥", desc: "ペア割 -¥500" },
+      { id: "ppl-3", label: "3名以上", price: -1000, emoji: "👨‍👩‍👧", desc: "グループ割 -¥1,000" },
     ],
   },
 ];
@@ -116,9 +119,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      <header className="bg-green-700 text-white py-5 px-4 shadow-lg">
-        <div className="max-w-lg mx-auto text-center">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 via-white to-green-50">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-green-700 to-green-600 text-white py-6 px-4 shadow-lg">
+        <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-2xl font-bold tracking-wide">料金シミュレーター</h1>
           <p className="text-green-100 text-sm mt-1">
             メニューを選んで、お見積りをご確認ください
@@ -126,19 +130,22 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-2xl mx-auto px-4 py-6 space-y-8 pb-52">
         {categories.map((cat) => (
-          <section
-            key={cat.title}
-            className="bg-white rounded-2xl shadow-md border border-green-100 overflow-hidden"
-          >
-            <div className="bg-green-600 text-white px-5 py-3">
-              <h2 className="font-bold text-lg">{cat.title}</h2>
+          <section key={cat.title}>
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="font-bold text-lg text-green-800">{cat.title}</h2>
               {cat.type === "multi" && (
-                <p className="text-green-100 text-xs mt-0.5">複数選択できます</p>
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
+                  複数選択OK
+                </span>
               )}
             </div>
-            <div className="p-4 space-y-2">
+            <div className={`grid gap-3 ${
+              cat.options.length <= 3
+                ? "grid-cols-3"
+                : "grid-cols-3 sm:grid-cols-3"
+            }`}>
               {cat.options.map((opt) => {
                 const isSelected =
                   cat.type === "single"
@@ -153,79 +160,78 @@ export default function Home() {
                         ? handleSingleSelect(cat.title, opt.id)
                         : handleMultiToggle(opt.id)
                     }
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all duration-200 ${
+                    className={`relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 aspect-square ${
                       isSelected
-                        ? "border-green-500 bg-green-50 shadow-sm"
-                        : "border-gray-200 bg-white hover:border-green-300 hover:bg-green-50/50"
+                        ? "border-green-500 bg-green-50 shadow-lg scale-[1.03]"
+                        : "border-gray-200 bg-white hover:border-green-300 hover:shadow-md"
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                          isSelected
-                            ? "border-green-500 bg-green-500"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        {isSelected && (
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={3}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        )}
+                    {/* Check mark */}
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
                       </div>
-                      <span
-                        className={`text-sm font-medium ${
-                          isSelected ? "text-green-800" : "text-gray-700"
-                        }`}
-                      >
-                        {opt.label}
-                      </span>
-                    </div>
-                    {opt.price !== 0 && (
-                      <span
-                        className={`text-sm font-bold ${
-                          opt.price > 0 ? "text-green-700" : "text-red-500"
-                        }`}
-                      >
-                        {opt.price > 0
-                          ? `¥${opt.price.toLocaleString()}`
-                          : `-¥${Math.abs(opt.price).toLocaleString()}`}
+                    )}
+
+                    {/* Emoji */}
+                    <span className="text-3xl mb-1">{opt.emoji}</span>
+
+                    {/* Label */}
+                    <span className={`text-xs font-bold text-center leading-tight ${
+                      isSelected ? "text-green-800" : "text-gray-700"
+                    }`}>
+                      {opt.label}
+                    </span>
+
+                    {/* Description */}
+                    {opt.desc && (
+                      <span className="text-[10px] text-gray-400 mt-0.5 text-center leading-tight">
+                        {opt.desc}
                       </span>
                     )}
+
+                    {/* Price */}
+                    <span className={`text-xs font-bold mt-1 ${
+                      opt.price > 0
+                        ? "text-green-600"
+                        : opt.price < 0
+                        ? "text-red-500"
+                        : "text-gray-400"
+                    }`}>
+                      {opt.price > 0
+                        ? `¥${opt.price.toLocaleString()}`
+                        : opt.price < 0
+                        ? `-¥${Math.abs(opt.price).toLocaleString()}`
+                        : "基本料金内"}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </section>
         ))}
+      </main>
 
-        {/* Price Display - Sticky */}
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-green-500 p-6 text-center sticky bottom-4">
-          <p className="text-sm text-green-600 font-medium mb-1">お見積り金額</p>
-          <p className="text-4xl font-extrabold text-green-800">
-            ¥{total.toLocaleString()}
-            <span className="text-base font-normal text-gray-500 ml-1">(税込)</span>
-          </p>
+      {/* Sticky Bottom Price Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t-2 border-green-500 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs text-green-600 font-medium">お見積り金額</p>
+            <p className="text-3xl font-extrabold text-green-800">
+              ¥{total.toLocaleString()}
+              <span className="text-xs font-normal text-gray-400 ml-1">(税込)</span>
+            </p>
+          </div>
           <button
             onClick={() => setShowResult(true)}
-            className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-200 shadow-md hover:shadow-lg"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
           >
-            この内容で問い合わせる
+            この内容で<br className="sm:hidden" />問い合わせる
           </button>
         </div>
-
-        <div className="h-4" />
-      </main>
+      </div>
 
       {/* Confirmation Modal */}
       {showResult && (
