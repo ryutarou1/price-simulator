@@ -155,7 +155,7 @@ export default function InquiriesPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    <div className="flex items-center gap-1 text-xs text-gray-400">
+                    <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400">
                       <Clock className="w-3 h-3" />
                       {inq.date}
                     </div>
